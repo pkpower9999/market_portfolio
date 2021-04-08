@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.uk.mapper.ProductMapper">
+		<insert id="insertProduct" useGeneratedKeys="true" keyProperty="mkp_seq">
+		INSERT INTO mk_products(
+			mkp_name,
+			mkp_sub_name,
+			mkp_bi_seq,
+			mkp_ci_seq,
+			mkp_price,
+			mkp_discount,
+			mkp_discount_rate,
+			mkp_point_rate,
+			mkp_unit,
+			mkp_weight,
+			mkp_early_delivery,
+			mkp_delivery,
+			mkp_packing_type,
+			mkp_allergy_info,
+			mkp_exp_date,
+			mkp_relation_seq
+		)
+		VALUES (
+			#{mkp_name},
+			#{mkp_sub_name},
+			#{mkp_bi_seq},
+			#{mkp_ci_seq},
+			#{mkp_price},
+			#{mkp_discount},
+			#{mkp_discount_rate},
+			#{mkp_point_rate},
+			#{mkp_unit},
+			#{mkp_weight},
+			#{mkp_early_delivery},
+			#{mkp_delivery},
+			#{mkp_packing_type},
+			#{mkp_allergy_info},
+			#{mkp_exp_date},
+			#{mkp_relation_seq}
+		)
+	</insert>
+	
+		<select id="selectProducts" resultType="kr.co.uk.vo.ProductVO">
+		SELECT c.*, d.mkpc_name AS category_name FROM
+		(
+			SELECT a.*, b.mkb_name AS brand_name
+			FROM mk_products a INNER JOIN mk_brand b
+			ON a.mkp_bi_seq=b.mkb_seq
+		) c 
+		INNER JOIN mk_product_category d
+		ON c.mkp_ci_seq=d.mkpc_seq
+		<if test="(brand_seq != 0 and brand_seq != null) and (cate_seq == null or cate_seq  == 0)">
+			WHERE mkp_bi_seq=#{brand_seq}
+			<if test="keyword != null">
+				AND mkp_name LIKE #{keyword}
+			</if>
+		</if>
+		<if test="(cate_seq != 0 and cate_seq != null) and (brand_seq == null or brand_seq == 0)">
+			WHERE mkp_ci_seq=#{cate_seq}
+			<if test="keyword != null">
+				AND mkp_name LIKE #{keyword}
+			</if>
+		</if>
+		<if test="(cate_seq != 0 and cate_seq != null) and (brand_seq != null and brand_seq != 0)">
+			WHERE mkp_bi_seq=#{brand_seq} AND mkp_ci_seq=#{cate_seq}
+			<if test="keyword != null">
+				AND mkp_name LIKE #{keyword}
+			</if>
+		</if>
+		<if test="(cate_seq == 0 or cate_seq == null) and (brand_seq == 0 or brand_seq == null)">
+			<if test="keyword != null">
+				WHERE mkp_name LIKE #{keyword}
+			</if>
+		</if>
+	</select>
+	
+	<delete id="deleteProduct">
+		DELETE FROM mk_products WHERE mkp_seq=#{seq}
+	</delete>
+	
+	<select id="selectProductBySeq" resultType="kr.co.uk.vo.ProductVO">
+		SELECT * FROM mk_products WHERE mkp_seq=#{seq}
+	</select>
+	
+	<update id="updateProduct">
+		UPDATE mk_products 
+		SET
+			mkp_name=#{mkp_name},
+			mkp_sub_name=#{mkp_sub_name},
+			mkp_bi_seq=#{mkp_bi_seq},
+			mkp_ci_seq=#{mkp_ci_seq},
+			mkp_price=#{mkp_price},
+			mkp_discount=#{mkp_discount},
+			mkp_discount_rate=#{mkp_discount_rate},
+			mkp_point_rate=#{mkp_point_rate},
+			mkp_unit=#{mkp_unit},
+			mkp_weight=#{mkp_weight},
+			mkp_early_delivery=#{mkp_early_delivery},
+			mkp_delivery=#{mkp_delivery},
+			mkp_packing_type=#{mkp_packing_type},
+			mkp_allergy_info=#{mkp_allergy_info},
+			mkp_exp_date=#{mkp_exp_date},
+			mkp_relation_seq=#{mkp_relation_seq}
+		WHERE mkp_seq=#{mkp_seq}
+		
+	</update>
+</mapper>
